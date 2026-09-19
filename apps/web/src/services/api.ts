@@ -1,8 +1,23 @@
 const API_BASE = (import.meta.env.VITE_API_URL as string) || '/api';
 
+// Decode JWT payload to check expiry client-side without crypto
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true; // malformed token — treat as expired
+  }
+}
+
 export function getAuthHeader(): Record<string, string> {
   const token = localStorage.getItem('campussynapse_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  if (!token || isTokenExpired(token)) {
+    // Stale token — remove it so auto-relogin kicks in
+    if (token) localStorage.removeItem('campussynapse_token');
+    return {};
+  }
+  return { Authorization: `Bearer ${token}` };
 }
 
 async function autoReLogin(): Promise<string | null> {

@@ -3,7 +3,7 @@ import { useCampusStore } from '../store/useCampusStore';
 import { Resource, ResourceStatus } from '../types';
 import { Users, Thermometer, Zap, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
-export const STATUS_STYLES: Record<
+const STATUS_STYLES: Record<
   ResourceStatus,
   { bg: string; text: string; border: string; dot: string; label: string }
 > = {
