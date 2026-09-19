@@ -43,12 +43,17 @@ export const AppLayout: React.FC = () => {
   }, [initApp]);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-slate-100">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-mesh-pattern text-slate-100 relative">
+      {/* Background Decorative Ambient Glows */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none animate-pulse-slow" />
+      <div className="absolute top-1/2 right-10 w-[350px] h-[350px] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+
       {/* Top Mission Control Header */}
       <Header />
 
       {/* Main Container */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden z-10">
         {/* Sidebar */}
         <Sidebar />
 
@@ -65,28 +70,28 @@ export const AppLayout: React.FC = () => {
 
       {/* Floating Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 animate-fadeInUp">
           <div
-            className={`p-4 rounded-xl border shadow-2xl flex items-center space-x-3 text-xs font-medium max-w-md ${
+            className={`p-4 rounded-2xl backdrop-blur-xl border shadow-2xl flex items-center space-x-3 text-xs font-semibold max-w-md ${
               toast.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
+                ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200 shadow-emerald-950/50'
                 : toast.type === 'error'
-                ? 'bg-rose-950/90 border-rose-500/50 text-rose-200'
+                ? 'bg-rose-950/90 border-rose-500/40 text-rose-200 shadow-rose-950/50'
                 : toast.type === 'warning'
-                ? 'bg-amber-950/90 border-amber-500/50 text-amber-200'
-                : 'bg-surface-elevated border-surface-border text-slate-200'
+                ? 'bg-amber-950/90 border-amber-500/40 text-amber-200 shadow-amber-950/50'
+                : 'bg-slate-900/95 border-cyan-500/30 text-slate-200 shadow-cyan-950/50'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />}
-            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
-            {toast.type === 'warning' && <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />}
-            {toast.type === 'info' && <Info className="w-4 h-4 text-blue-400 shrink-0" />}
+            {toast.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
+            {toast.type === 'warning' && <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />}
+            {toast.type === 'info' && <Info className="w-5 h-5 text-cyan-400 shrink-0" />}
             <span className="flex-1">{toast.message}</span>
             <button
               onClick={clearToast}
-              className="p-1 text-slate-400 hover:text-white transition"
+              className="p-1 text-slate-400 hover:text-white transition rounded-lg hover:bg-white/10"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

@@ -3,14 +3,14 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Layers, Sparkles, FlaskConical, Server,
   CalendarDays, ClipboardList, Wrench, ShieldCheck,
-  BarChart3, FileText, Settings2,
+  BarChart3, FileText, Settings2, Activity
 } from 'lucide-react';
 import { useCampusStore } from '../store/useCampusStore';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/digital-twin', label: 'Digital Twin', icon: Layers, badge: 'LIVE' },
-  { to: '/orchestrator', label: 'AI Orchestrator', icon: Sparkles, badge: 'AI' },
+  { to: '/digital-twin', label: 'Digital Twin', icon: Layers, badge: 'LIVE', badgeColor: 'badge-glow-emerald' },
+  { to: '/orchestrator', label: 'AI Orchestrator', icon: Sparkles, badge: 'AI', badgeColor: 'badge-glow-cyan' },
   { to: '/simulator', label: 'What-If Simulator', icon: FlaskConical },
   { to: '/resources', label: 'Resources', icon: Server },
   { to: '/schedules', label: 'Schedules', icon: CalendarDays },
@@ -22,67 +22,74 @@ const NAV_ITEMS = [
   { to: '/settings', label: 'Settings', icon: Settings2 },
 ];
 
-const BADGE_STYLES: Record<string, string> = {
-  LIVE: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
-  AI: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
-};
-
 export const Sidebar: React.FC = () => {
   const { pendingApprovalsCount } = useCampusStore();
 
   return (
-    <aside className="w-56 shrink-0 flex flex-col border-r border-[rgba(38,51,77,0.5)] bg-[rgba(6,10,18,0.7)] backdrop-blur-xl">
-      {/* Nav Section Label */}
-      <div className="px-4 pt-4 pb-2">
-        <span className="text-[9px] font-mono font-bold tracking-[0.15em] uppercase text-slate-600">
-          Mission Control
+    <aside className="w-60 shrink-0 flex flex-col glass-panel border-r border-white/10 z-20">
+      {/* Nav Section Header Label */}
+      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-slate-400">
+          Navigation Control
         </span>
+        <span className="w-2 h-2 rounded-full bg-cyan-400 status-pulse-dot" />
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-2 pb-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, badge }) => (
+      {/* Navigation Links */}
+      <nav className="flex-1 px-3 pb-4 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map(({ to, label, icon: Icon, badge, badgeColor }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
-              `sidebar-item group ${isActive ? 'active' : ''}`
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group relative ${
+                isActive
+                  ? 'bg-gradient-to-r from-cyan-500/20 via-indigo-500/10 to-transparent text-cyan-300 border border-cyan-500/30 shadow-glow-cyan font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`
             }
           >
-            <Icon className="w-[15px] h-[15px] shrink-0 opacity-80" />
-            <span className="flex-1 leading-none">{label}</span>
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-cyan-400 rounded-r-full shadow-glow-cyan" />
+                )}
+                <Icon className={`w-4 h-4 shrink-0 transition duration-200 ${isActive ? 'text-cyan-400 scale-110' : 'text-slate-400 group-hover:text-cyan-300'}`} />
+                <span className="flex-1 tracking-tight">{label}</span>
 
-            {/* Pending approvals badge */}
-            {to === '/approvals' && pendingApprovalsCount > 0 && (
-              <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 min-w-[18px] text-center">
-                {pendingApprovalsCount}
-              </span>
-            )}
+                {/* Pending approvals count badge */}
+                {to === '/approvals' && pendingApprovalsCount > 0 && (
+                  <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-full badge-glow-amber">
+                    {pendingApprovalsCount}
+                  </span>
+                )}
 
-            {/* Feature badge */}
-            {badge && (
-              <span
-                className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border ${BADGE_STYLES[badge]}`}
-              >
-                {badge}
-              </span>
+                {/* Feature badge */}
+                {badge && (
+                  <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${badgeColor}`}>
+                    {badge}
+                  </span>
+                )}
+              </>
             )}
           </NavLink>
         ))}
       </nav>
 
       {/* System Integrity Footer */}
-      <div className="px-3 pb-4 pt-3 border-t border-[rgba(38,51,77,0.4)]">
-        <div className="px-3 py-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 radar-pulse shrink-0" />
-            <span className="text-[10px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">
-              System Online
-            </span>
+      <div className="p-4 border-t border-white/10">
+        <div className="p-3 rounded-2xl bg-slate-900/80 border border-emerald-500/20 flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <Activity className="w-4 h-4 animate-pulse" />
           </div>
-          <p className="text-[9px] text-slate-500 font-mono leading-tight">
-            All microservices operational
-          </p>
+          <div>
+            <div className="text-xs font-bold text-emerald-400 font-mono flex items-center gap-1.5">
+              <span>SYSTEM ONLINE</span>
+            </div>
+            <p className="text-[10px] text-slate-400 font-medium">
+              All microservices operational
+            </p>
+          </div>
         </div>
       </div>
     </aside>
