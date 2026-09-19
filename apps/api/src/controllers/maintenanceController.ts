@@ -56,42 +56,56 @@ export async function reportMaintenance(req: Request, res: Response): Promise<vo
 }
 
 export async function updateTicketStatus(req: Request, res: Response): Promise<void> {
-  const { id } = req.params;
-  const { status } = req.body;
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
 
-  const ticket = await MaintenanceTicketModel.findById(id);
-  if (!ticket) {
-    res.status(404).json({ error: 'Ticket not found.' });
-    return;
-  }
+    if (!id || id === 'undefined') {
+      res.status(400).json({ error: 'Valid ticket ID or ticket number required.' });
+      return;
+    }
 
-  ticket.status = status;
-  if (status === 'RESOLVED' || status === 'CLOSED') {
-    ticket.resolvedAt = new Date();
-
-    // If resource was blocked under maintenance, restore it to AVAILABLE
-    await ResourceModel.findOneAndUpdate(
-      { $or: [{ _id: ticket.resourceId }, { code: ticket.resourceId }, { name: ticket.resourceName }] },
-      {
-        status: 'AVAILABLE',
-        'maintenanceState.isUnderMaintenance': false,
-        'maintenanceState.issue': '',
-      }
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    const ticket = await MaintenanceTicketModel.findOne(
+      isObjectId ? { $or: [{ _id: id }, { ticketNumber: id }] } : { ticketNumber: id }
     );
 
-    await emitCampusEvent({
-      type: 'RESOURCE_RELEASED',
-      actor: (req as any).user?.name || 'Maintenance Crew',
-      agent: 'MaintenanceAgent',
-      action: 'RESOLVE_MAINTENANCE_TICKET',
-      reason: `Maintenance Ticket ${ticket.ticketNumber} marked ${status}. Resource ${ticket.resourceName} restored to operational status.`,
-      affectedResources: [ticket.resourceName],
-      previousState: 'MAINTENANCE',
-      newState: 'AVAILABLE',
-      approvalRequired: false,
-    });
-  }
-  await ticket.save();
+    if (!ticket) {
+      res.status(404).json({ error: 'Ticket not found.' });
+      return;
+    }
 
-  res.json({ success: true, ticket });
+    ticket.status = status;
+    if (status === 'RESOLVED' || status === 'CLOSED') {
+      ticket.resolvedAt = new Date();
+
+      // If resource was blocked under maintenance, restore it to AVAILABLE
+      await ResourceModel.findOneAndUpdate(
+        { $or: [{ _id: ticket.resourceId }, { code: ticket.resourceId }, { name: ticket.resourceName }] },
+        {
+          status: 'AVAILABLE',
+          'maintenanceState.isUnderMaintenance': false,
+          'maintenanceState.issue': '',
+        }
+      );
+
+      await emitCampusEvent({
+        type: 'RESOURCE_RELEASED',
+        actor: (req as any).user?.name || 'Maintenance Crew',
+        agent: 'MaintenanceAgent',
+        action: 'RESOLVE_MAINTENANCE_TICKET',
+        reason: `Maintenance Ticket ${ticket.ticketNumber} marked ${status}. Resource ${ticket.resourceName} restored to operational status.`,
+        affectedResources: [ticket.resourceName],
+        previousState: 'MAINTENANCE',
+        newState: 'AVAILABLE',
+        approvalRequired: false,
+      });
+    }
+    await ticket.save();
+
+    res.json({ success: true, ticket });
+  } catch (err) {
+    console.error('Error updating maintenance ticket status:', err);
+    res.status(500).json({ error: (err as Error).message });
+  }
 }

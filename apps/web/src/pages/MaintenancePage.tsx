@@ -183,7 +183,7 @@ export const MaintenancePage: React.FC = () => {
 
               {t.status !== 'RESOLVED' && t.status !== 'CLOSED' && (
                 <button
-                  onClick={() => handleResolve(t.id)}
+                  onClick={() => handleResolve((t as any)._id || t.id || t.ticketNumber)}
                   className="px-3.5 py-1.5 rounded bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-semibold shrink-0 transition"
                 >
                   RESOLVE & UNBLOCK
