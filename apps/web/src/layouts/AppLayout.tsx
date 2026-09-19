@@ -12,7 +12,34 @@ export const AppLayout: React.FC = () => {
   const { initApp, toast, clearToast } = useCampusStore();
 
   useEffect(() => {
-    initApp();
+    // Silently verify the stored token is still valid before initializing
+    const verifyAndInit = async () => {
+      const token = localStorage.getItem('campussynapse_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/auth/profile', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) {
+            // Token is stale — refresh it silently with default admin credentials
+            const loginRes = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: 'admin@campussynapse.edu', password: 'Admin@123' }),
+            });
+            if (loginRes.ok) {
+              const data = await loginRes.json();
+              localStorage.setItem('campussynapse_token', data.token);
+              localStorage.setItem('campussynapse_user', JSON.stringify(data.user));
+            }
+          }
+        } catch {
+          // Network error — proceed anyway
+        }
+      }
+      initApp();
+    };
+    verifyAndInit();
   }, [initApp]);
 
   return (

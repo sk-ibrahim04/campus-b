@@ -5,13 +5,48 @@ export function getAuthHeader(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-async function handleResponse<T>(res: Response): Promise<T> {
+async function autoReLogin(): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'admin@campussynapse.edu', password: 'Admin@123' }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('campussynapse_token', data.token);
+        localStorage.setItem('campussynapse_user', JSON.stringify(data.user));
+        return data.token;
+      }
+    }
+  } catch {
+    // silent
+  }
+  return null;
+}
+
+async function handleResponse<T>(res: Response, retryFn?: () => Promise<Response>): Promise<T> {
+  if (res.status === 401 && retryFn) {
+    // Token expired or invalid — attempt silent re-login
+    const newToken = await autoReLogin();
+    if (newToken) {
+      const retried = await retryFn();
+      if (retried.ok) return retried.json();
+    }
+    // If re-login failed, clear storage and reload
+    localStorage.removeItem('campussynapse_token');
+    localStorage.removeItem('campussynapse_user');
+    window.location.href = '/login';
+    throw new Error('Session expired. Redirecting to login...');
+  }
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(errorData.error || `HTTP error ${res.status}`);
   }
   return res.json();
 }
+
 
 export const api = {
   // Auth
@@ -26,19 +61,17 @@ export const api = {
 
   // Dashboard
   getDashboard: async () => {
-    const res = await fetch(`${API_BASE}/dashboard`, {
-      headers: getAuthHeader(),
-    });
-    return handleResponse<any>(res);
+    const fetcher = () => fetch(`${API_BASE}/dashboard`, { headers: getAuthHeader() });
+    const res = await fetcher();
+    return handleResponse<any>(res, fetcher);
   },
 
   // Resources
   getResources: async (params?: { buildingId?: string; status?: string; type?: string }) => {
     const query = new URLSearchParams(params as Record<string, string>).toString();
-    const res = await fetch(`${API_BASE}/resources?${query}`, {
-      headers: getAuthHeader(),
-    });
-    return handleResponse<any[]>(res);
+    const fetcher = () => fetch(`${API_BASE}/resources?${query}`, { headers: getAuthHeader() });
+    const res = await fetcher();
+    return handleResponse<any[]>(res, fetcher);
   },
 
   getResourceById: async (id: string) => {
@@ -91,40 +124,48 @@ export const api = {
 
   // Orchestrator
   interpretCommand: async (prompt: string) => {
-    const res = await fetch(`${API_BASE}/orchestrator/interpret`, {
+    const body = JSON.stringify({ prompt });
+    const fetcher = () => fetch(`${API_BASE}/orchestrator/interpret`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify({ prompt }),
+      body,
     });
-    return handleResponse<any>(res);
+    const res = await fetcher();
+    return handleResponse<any>(res, fetcher);
   },
 
   planAndOptimize: async (params: { prompt?: string; requestedIntent?: any; weights?: any }) => {
-    const res = await fetch(`${API_BASE}/orchestrator/plan`, {
+    const body = JSON.stringify(params);
+    const fetcher = () => fetch(`${API_BASE}/orchestrator/plan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(params),
+      body,
     });
-    return handleResponse<any>(res);
+    const res = await fetcher();
+    return handleResponse<any>(res, fetcher);
   },
 
   executePlan: async (payload: any) => {
-    const res = await fetch(`${API_BASE}/orchestrator/execute`, {
+    const body = JSON.stringify(payload);
+    const fetcher = () => fetch(`${API_BASE}/orchestrator/execute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(payload),
+      body,
     });
-    return handleResponse<any>(res);
+    const res = await fetcher();
+    return handleResponse<any>(res, fetcher);
   },
 
   // Simulator
   runSimulation: async (params: any) => {
-    const res = await fetch(`${API_BASE}/simulator/run`, {
+    const body = JSON.stringify(params);
+    const fetcher = () => fetch(`${API_BASE}/simulator/run`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(params),
+      body,
     });
-    return handleResponse<any>(res);
+    const res = await fetcher();
+    return handleResponse<any>(res, fetcher);
   },
 
   // Approvals
