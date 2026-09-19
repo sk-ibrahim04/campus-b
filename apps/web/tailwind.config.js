@@ -5,10 +5,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#090d16',
-        surface: '#111827',
-        'surface-elevated': '#1a2234',
-        'surface-border': '#26334d',
+        background: '#060a12',
+        surface: {
+          DEFAULT: '#0d1117',
+          elevated: '#111827',
+          border: 'rgba(38, 51, 77, 0.85)',
+        },
         primary: {
           DEFAULT: '#3b82f6',
           hover: '#2563eb',
@@ -24,7 +26,30 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'monospace'],
+      },
+      borderRadius: {
+        '2xl': '16px',
+        '3xl': '24px',
+      },
+      boxShadow: {
+        'glow-blue': '0 0 24px rgba(59, 130, 246, 0.4)',
+        'glow-emerald': '0 0 24px rgba(16, 185, 129, 0.4)',
+        'glow-purple': '0 0 24px rgba(139, 92, 246, 0.4)',
+        'glow-amber': '0 0 24px rgba(245, 158, 11, 0.4)',
+        'card': '0 4px 20px rgba(0, 0, 0, 0.35)',
+        'card-hover': '0 8px 32px rgba(0, 0, 0, 0.5)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-mission': 'linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(26, 34, 52, 0.9) 100%)',
+      },
+      animation: {
+        'float-up': 'float-up 0.35s ease-out both',
+        'radar-pulse': 'radar-pulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+        'spin-slow': 'spin-slow 8s linear infinite',
+        'glow-breathe': 'glow-breathe 3s ease-in-out infinite',
+        'shimmer': 'shimmer 1.8s ease-in-out infinite',
       },
     },
   },

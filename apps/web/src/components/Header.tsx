@@ -1,10 +1,10 @@
 import React from 'react';
 import { useCampusStore } from '../store/useCampusStore';
-import { Play, RotateCcw, Activity, ShieldCheck, Cpu, Zap } from 'lucide-react';
+import { Play, RotateCcw, ShieldCheck, Cpu, Zap, Activity } from 'lucide-react';
 import { api } from '../services/api';
 
 export const Header: React.FC = () => {
-  const { systemHealth, telemetry, setHealthModalOpen, setDemoModalOpen, showToast, fetchDashboard, fetchResources } =
+  const { systemHealth, setHealthModalOpen, setDemoModalOpen, showToast, fetchDashboard, fetchResources } =
     useCampusStore();
 
   const handleResetDemo = async () => {
@@ -20,74 +20,86 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 border-b border-surface-border bg-surface/90 backdrop-blur-md sticky top-0 z-30 px-6 flex items-center justify-between">
-      {/* Left: Brand & Tagline */}
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Cpu className="w-5 h-5 text-white" />
+    <header className="header-glow h-14 sticky top-0 z-30 px-5 flex items-center justify-between">
+      {/* Left: Brand */}
+      <div className="flex items-center gap-3">
+        {/* Logo */}
+        <div className="relative">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <Cpu className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-extrabold tracking-wider text-white text-base">CAMPUSSYNAPSE</span>
-              <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                SIH26193
-              </span>
-            </div>
-            <div className="text-[11px] text-slate-400 flex items-center space-x-1 font-mono">
-              <span className="text-emerald-400">OBSERVE</span>
-              <span>→</span>
-              <span className="text-amber-400">SIMULATE</span>
-              <span>→</span>
-              <span className="text-blue-400">DECIDE</span>
-              <span>→</span>
-              <span className="text-purple-400">AUTOMATE</span>
-            </div>
+          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#060a12] radar-pulse" />
+        </div>
+
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold tracking-[0.08em] text-white text-[13px] leading-none">
+              CAMPUSSYNAPSE
+            </span>
+            <span className="text-[8px] font-mono font-bold px-1.5 py-[2px] rounded bg-blue-500/12 text-blue-400 border border-blue-500/20 tracking-widest">
+              SIH26193
+            </span>
+          </div>
+          <div className="flex items-center gap-1 mt-0.5">
+            {['OBSERVE', 'SIMULATE', 'DECIDE', 'AUTOMATE'].map((step, i) => (
+              <React.Fragment key={step}>
+                <span className={`text-[9px] font-mono font-semibold ${
+                  i === 0 ? 'text-emerald-400' :
+                  i === 1 ? 'text-amber-400' :
+                  i === 2 ? 'text-blue-400' : 'text-purple-400'
+                }`}>{step}</span>
+                {i < 3 && <span className="text-[9px] text-slate-600">›</span>}
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Center: Realtime Telemetry & Health Quick Status */}
-      <div className="hidden lg:flex items-center space-x-4">
+      {/* Center: Live Status Chips */}
+      <div className="hidden lg:flex items-center gap-2">
+        {/* System Health */}
         <button
           onClick={() => setHealthModalOpen(true)}
-          className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-surface-elevated border border-surface-border hover:border-slate-600 transition text-xs font-mono"
-          title="Inspect System Observability Matrix"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/6 border border-emerald-500/18 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition text-[11px] font-mono group"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 radar-pulse" />
-          <span className="text-slate-300">SYSTEM HEALTH</span>
+          <Activity className="w-3 h-3 text-emerald-400 group-hover:animate-pulse" />
+          <span className="text-slate-400">SYSTEM HEALTH</span>
           <span className="text-emerald-400 font-bold">100%</span>
         </button>
 
-        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-surface-elevated border border-surface-border text-xs font-mono">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+        {/* Autonomy Level */}
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/6 border border-blue-500/18 text-[11px] font-mono">
+          <ShieldCheck className="w-3 h-3 text-blue-400" />
           <span className="text-slate-400">AUTONOMY:</span>
-          <span className="text-blue-400 font-semibold">L2 (Approve & Exec)</span>
+          <span className="text-blue-400 font-bold">L2 (Approve &amp; Exec)</span>
         </div>
 
-        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-surface-elevated border border-surface-border text-xs font-mono">
-          <Zap className="w-3.5 h-3.5 text-amber-400" />
+        {/* Optimizer */}
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/6 border border-amber-500/18 text-[11px] font-mono">
+          <Zap className="w-3 h-3 text-amber-400" />
           <span className="text-slate-400">OPTIMIZER:</span>
-          <span className="text-amber-400 font-semibold">{systemHealth?.optimizer.engine || 'OR-TOOLS CP-SAT'}</span>
+          <span className="text-amber-400 font-bold">
+            {systemHealth?.optimizer?.engine || 'OR-TOOLS CP-SAT'}
+          </span>
         </div>
       </div>
 
-      {/* Right: Judge-Ready Demo Actions */}
-      <div className="flex items-center space-x-3">
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2">
         <button
           onClick={() => setDemoModalOpen(true)}
-          className="flex items-center space-x-2 px-3.5 py-1.5 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-medium shadow-md shadow-blue-500/25 transition active:scale-95"
+          className="btn-glow flex items-center gap-2 px-4 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-semibold shadow-lg shadow-blue-500/25 transition"
         >
-          <Play className="w-3.5 h-3.5 fill-current" />
-          <span>RUN DEMO</span>
+          <Play className="w-3 h-3 fill-current" />
+          RUN DEMO
         </button>
 
         <button
           onClick={handleResetDemo}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-surface-elevated hover:bg-slate-800 border border-surface-border text-slate-300 hover:text-white text-xs font-medium transition active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(26,34,52,0.8)] hover:bg-[rgba(38,51,77,0.8)] border border-[rgba(38,51,77,0.9)] text-slate-300 hover:text-white text-[11px] font-medium transition active:scale-95"
           title="Restore Pristine Synthetic Campus State"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-3 h-3" />
           <span className="hidden sm:inline">RESET</span>
         </button>
       </div>
