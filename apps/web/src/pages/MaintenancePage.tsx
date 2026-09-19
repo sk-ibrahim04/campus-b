@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { useCampusStore } from '../store/useCampusStore';
-import { MaintenanceTicket } from '@campussynapse/shared-types';
+import { MaintenanceTicket } from '../types';
 import { Wrench, AlertTriangle, ShieldAlert, CheckCircle2, Plus, Send, Clock } from 'lucide-react';
 
 export const MaintenancePage: React.FC = () => {

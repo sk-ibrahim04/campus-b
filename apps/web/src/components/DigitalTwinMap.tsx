@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCampusStore } from '../store/useCampusStore';
-import { Resource, ResourceStatus } from '@campussynapse/shared-types';
+import { Resource, ResourceStatus } from '../types';
 import { Users, Thermometer, Zap, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
 export const STATUS_STYLES: Record<

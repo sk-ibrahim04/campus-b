@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Resource, Building, CampusTelemetrySummary, SystemHealthStatus, User } from '@campussynapse/shared-types';
+import { Resource, Building, CampusTelemetrySummary, SystemHealthStatus, User } from '../types';
 import { api } from '../services/api';
 import { getSocket } from '../services/socket';
 

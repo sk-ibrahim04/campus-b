@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { useCampusStore } from '../store/useCampusStore';
-import { ApprovalRequest } from '@campussynapse/shared-types';
+import { ApprovalRequest } from '../types';
 import { CheckSquare, ShieldCheck, Check, X, AlertTriangle, Clock, Layers } from 'lucide-react';
 
 export const ApprovalsPage: React.FC = () => {

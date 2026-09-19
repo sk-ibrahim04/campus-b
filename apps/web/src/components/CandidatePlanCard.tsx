@@ -1,5 +1,5 @@
 import React from 'react';
-import { CandidatePlan } from '@campussynapse/shared-types';
+import { CandidatePlan } from '../types';
 import { Award, Check, AlertCircle } from 'lucide-react';
 
 interface CandidatePlanCardProps {

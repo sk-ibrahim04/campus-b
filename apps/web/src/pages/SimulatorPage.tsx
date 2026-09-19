@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCampusStore } from '../store/useCampusStore';
 import { api } from '../services/api';
-import { WhatIfSimulationResult } from '@campussynapse/shared-types';
+import { WhatIfSimulationResult } from '../types';
 import {
   Compass,
   Play,

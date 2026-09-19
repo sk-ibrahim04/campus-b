@@ -1,5 +1,5 @@
 import React from 'react';
-import { CandidatePlan } from '@campussynapse/shared-types';
+import { CandidatePlan } from '../types';
 import { CheckCircle2, AlertTriangle, ShieldCheck, Scale, Cpu } from 'lucide-react';
 
 interface DecisionCardProps {
