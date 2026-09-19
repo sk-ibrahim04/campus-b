@@ -65,9 +65,10 @@ export async function updateTicketStatus(req: Request, res: Response): Promise<v
       return;
     }
 
-    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    const ticketId = Array.isArray(id) ? id[0] : String(id);
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(ticketId);
     const ticket = await MaintenanceTicketModel.findOne(
-      isObjectId ? { $or: [{ _id: id }, { ticketNumber: id }] } : { ticketNumber: id }
+      isObjectId ? { $or: [{ _id: ticketId }, { ticketNumber: ticketId }] } : { ticketNumber: ticketId }
     );
 
     if (!ticket) {

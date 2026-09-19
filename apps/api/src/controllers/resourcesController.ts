@@ -62,9 +62,9 @@ export async function updateResourceStatus(req: Request, res: Response): Promise
 }
 
 export async function recoverGhostResource(req: Request, res: Response): Promise<void> {
-  const { id } = req.params;
+  const resourceId = Array.isArray(req.params.id) ? req.params.id[0] : String(req.params.id);
   const actor = (req as any).user?.name || 'Administrator';
-  const success = await RecoveryService.recoverResource(id, actor);
+  const success = await RecoveryService.recoverResource(resourceId, actor);
 
   if (!success) {
     res.status(404).json({ error: 'Resource not found or could not be recovered.' });
@@ -72,7 +72,7 @@ export async function recoverGhostResource(req: Request, res: Response): Promise
   }
 
   const updated = await ResourceModel.findOne({
-    $or: [{ _id: id }, { code: id }, { name: id }],
+    $or: [{ _id: resourceId }, { code: resourceId }, { name: resourceId }],
   });
   res.json({ success: true, resource: updated });
 }
