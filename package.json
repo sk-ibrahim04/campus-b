@@ -1,0 +1,30 @@
+{
+  "name": "campussynapse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Autonomous Campus Digital Twin & Resource Orchestration System (SIH26193)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"api,web\" -c \"blue,green\" \"npm run dev --workspace=@campussynapse/api\" \"npm run dev --workspace=@campussynapse/web\"",
+    "dev:all": "concurrently -n \"opt,api,web\" -c \"magenta,blue,green\" \"npm run start:optimizer\" \"npm run dev --workspace=@campussynapse/api\" \"npm run dev --workspace=@campussynapse/web\"",
+    "build": "npm run build --workspaces",
+    "seed": "npm run seed --workspace=@campussynapse/api",
+    "start:optimizer": "cd services/optimizer && (source venv/bin/activate 2>/dev/null || true) && uvicorn app.main:app --port 8000 --reload"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "digital-twin",
+    "campus-orchestration",
+    "autonomous-operations",
+    "sih2026",
+    "smart-campus",
+    "ai-agents"
+  ],
+  "author": "CampusSynapse Team",
+  "license": "MIT"
+}
